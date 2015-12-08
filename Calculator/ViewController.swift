@@ -17,7 +17,7 @@ class ViewController: UIViewController {
     
     @IBAction func clearOperandStack() {
         userIsTheMiddleOfTypingANumber = false
-        displayValue = 0
+        displayValue = nil
         operandStack.removeAll()
         history.text = " "
     }
@@ -31,6 +31,20 @@ class ViewController: UIViewController {
         } else {
             display.text = digit
             userIsTheMiddleOfTypingANumber = true
+            if history.text!.hasSuffix("=") {
+                history.text = history.text!.substringToIndex(history.text!.endIndex.advancedBy(-2))
+            }
+        }
+    }
+    
+    @IBAction func deleteDigit() {
+        if userIsTheMiddleOfTypingANumber {
+            if display.text!.characters.count == 1 {
+                userIsTheMiddleOfTypingANumber = false
+                displayValue = nil
+            } else {
+                display.text = String(display.text!.characters.dropLast())
+            }
         }
     }
     
@@ -49,6 +63,9 @@ class ViewController: UIViewController {
         }
         
         if validConstant {
+            if history.text!.hasSuffix("=") {
+                history.text = history.text!.substringToIndex(history.text!.endIndex.advancedBy(-2))
+            }
             history.text = history.text! + " \(constant)"
         }
     }
@@ -74,7 +91,24 @@ class ViewController: UIViewController {
         }
         
         if validOperation {
-            history.text = history.text! + " \(operation)"
+            history.text = history.text! + " \(operation) ="
+        }
+    }
+    
+    @IBAction func negate() {
+        if userIsTheMiddleOfTypingANumber {
+            if display.text!.hasPrefix("−") {
+                display.text = display.text!.substringFromIndex(display.text!.startIndex.advancedBy(1))
+            } else {
+                display.text = "−" + display.text!
+            }
+        } else if operandStack.count >= 1 {
+            if history.text!.hasSuffix("=") {
+                history.text = history.text!.substringToIndex(history.text!.endIndex.advancedBy(-2))
+            }
+            history.text = history.text! + " − ="
+            displayValue = -operandStack.removeLast()
+            enter()
         }
     }
     
@@ -102,17 +136,25 @@ class ViewController: UIViewController {
         }
         
         userIsTheMiddleOfTypingANumber = false
-        operandStack.append(displayValue)
+        operandStack.append(displayValue!)
         print("operandStack = \(operandStack)")
     }
     
-    var displayValue: Double {
+    var displayValue: Double? {
         get {
-            return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
+            if let number = NSNumberFormatter().numberFromString(display.text!) {
+                return number.doubleValue
+            } else {
+                return nil;
+            }
         }
         
         set {
-            display.text = "\(newValue)"
+            if let value = newValue {
+                display.text = "\(value)"
+            } else {
+                display.text = "0"
+            }
             userIsTheMiddleOfTypingANumber = false
         }
     }

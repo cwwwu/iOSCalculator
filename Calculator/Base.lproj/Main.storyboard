@@ -226,11 +226,19 @@
                                 <rect key="frame" x="249" y="96" width="102" height="93"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="+/−"/>
+                                <connections>
+                                    <action selector="negate" destination="BYZ-38-t0r" eventType="touchUpInside" id="Tao-iZ-2OV"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sLJ-8N-Uhe">
                                 <rect key="frame" x="359" y="96" width="103" height="93"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="⌫"/>
+                                <connections>
+                                    <action selector="deleteDigit" destination="BYZ-38-t0r" eventType="touchUpInside" id="kx7-dL-GCF"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DpX-Vw-1Y9">
                                 <rect key="frame" x="470" y="96" width="102" height="93"/>
