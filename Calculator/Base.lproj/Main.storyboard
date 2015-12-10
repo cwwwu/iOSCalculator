@@ -217,12 +217,18 @@
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                 <state key="normal" title="→M"/>
+                                <connections>
+                                    <action selector="setVariable" destination="BYZ-38-t0r" eventType="touchUpInside" id="4kP-GX-1G9"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jaf-3t-S0c">
                                 <rect key="frame" x="138" y="96" width="103" height="93"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                 <state key="normal" title="M"/>
+                                <connections>
+                                    <action selector="enterVariable" destination="BYZ-38-t0r" eventType="touchUpInside" id="Soi-u9-qmH"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fm3-BW-9xk">
                                 <rect key="frame" x="249" y="96" width="102" height="93"/>

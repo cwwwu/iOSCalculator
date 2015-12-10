@@ -20,7 +20,8 @@ class ViewController: UIViewController {
         userIsTheMiddleOfTypingANumber = false
         displayValue = nil
         history.text = " "
-        brain.clear()
+        brain.clearOpStack()
+        brain.clearVariables()
     }
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -59,6 +60,7 @@ class ViewController: UIViewController {
             } else {
                 displayValue = nil
             }
+            history.text = "\(brain)"
         }
     }
     
@@ -81,6 +83,29 @@ class ViewController: UIViewController {
         } else {
             displayValue = nil
         }
+        history.text = "\(brain)"
+    }
+    
+    @IBAction func setVariable() {
+        userIsTheMiddleOfTypingANumber = false
+        if let value = displayValue {
+            brain.variableValues["M"] = value
+        }
+        
+        if let result = brain.evaluate() {
+            displayValue = result
+        } else {
+            displayValue = nil
+        }
+    }
+    
+    @IBAction func enterVariable() {
+        if let result = brain.pushOperand("M") {
+            displayValue = result
+        } else {
+            displayValue = nil
+        }
+        history.text = "\(brain)"
     }
     
     var displayValue: Double? {
@@ -95,7 +120,6 @@ class ViewController: UIViewController {
         set {
             if let value = newValue {
                 display.text = "\(value)"
-                history.text = "\(brain) ="
             } else {
                 display.text = " "
             }

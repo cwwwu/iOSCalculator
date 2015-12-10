@@ -162,11 +162,15 @@ class CalculatorBrain: CustomStringConvertible {
     }
     
     func pushOperand(symbol: String) -> Double? {
-        return nil
+        opStack.append(Op.Variable(symbol))
+        return evaluate()
     }
     
-    func clear() {
+    func clearOpStack() {
         opStack.removeAll()
+    }
+    
+    func clearVariables() {
         variableValues.removeAll()
     }
 }
