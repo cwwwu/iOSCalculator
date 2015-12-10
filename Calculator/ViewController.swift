@@ -14,12 +14,13 @@ class ViewController: UIViewController {
     @IBOutlet weak var history: UILabel!
     
     var userIsTheMiddleOfTypingANumber = false
+    var brain = CalculatorBrain()
     
     @IBAction func clearOperandStack() {
         userIsTheMiddleOfTypingANumber = false
         displayValue = nil
-        operandStack.removeAll()
         history.text = " "
+        brain.clear()
     }
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -31,9 +32,6 @@ class ViewController: UIViewController {
         } else {
             display.text = digit
             userIsTheMiddleOfTypingANumber = true
-            if history.text!.hasSuffix("=") {
-                history.text = history.text!.substringToIndex(history.text!.endIndex.advancedBy(-2))
-            }
         }
     }
     
@@ -48,50 +46,19 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func enterConstant(sender: UIButton) {
-        if userIsTheMiddleOfTypingANumber {
-            enter()
-        }
-        
-        var validConstant = true
-        let constant = sender.currentTitle!
-        switch constant {
-        case "π":
-            displayValue = M_PI
-            enter()
-        default: validConstant = false
-        }
-        
-        if validConstant {
-            if history.text!.hasSuffix("=") {
-                history.text = history.text!.substringToIndex(history.text!.endIndex.advancedBy(-2))
-            }
-            history.text = history.text! + " \(constant)"
-        }
-    }
-    
     @IBAction func operate(sender: UIButton) {
-        let operation = sender.currentTitle!
         
         if userIsTheMiddleOfTypingANumber {
             enter()
         }
         
-        var validOperation = true
-        
-        switch operation {
-        case "×": performOperation { $0 * $1 }
-        case "÷": performOperation { $1 / $0 }
-        case "+": performOperation { $0 + $1 }
-        case "−": performOperation { $1 - $0 }
-        case "√": performOperation { sqrt($0) }
-        case "sin": performOperation { sin($0) }
-        case "cos": performOperation { cos($0) }
-        default: validOperation = false
-        }
-        
-        if validOperation {
-            history.text = history.text! + " \(operation) ="
+        if let operation = sender.currentTitle {
+            brain.performOperation(operation)
+            if let result = brain.evaluate() {
+                displayValue = result
+            } else {
+                displayValue = nil
+            }
         }
     }
     
@@ -102,42 +69,18 @@ class ViewController: UIViewController {
             } else {
                 display.text = "−" + display.text!
             }
-        } else if operandStack.count >= 1 {
-            if history.text!.hasSuffix("=") {
-                history.text = history.text!.substringToIndex(history.text!.endIndex.advancedBy(-2))
-            }
-            history.text = history.text! + " − ="
-            displayValue = -operandStack.removeLast()
-            enter()
+        } else {
+            //TODO:
         }
     }
-    
-    @nonobjc
-    func performOperation(operation: (Double, Double) -> Double) {
-        if operandStack.count >= 2 {
-            displayValue = operation(operandStack.removeLast(), operandStack.removeLast())
-            enter()
-        }
-    }
-    
-    @nonobjc
-    func performOperation(operation: Double -> Double) {
-        if operandStack.count >= 1 {
-            displayValue = operation(operandStack.removeLast())
-            enter()
-        }
-    }
-    
-    var operandStack = Array<Double>()
     
     @IBAction func enter() {
-        if userIsTheMiddleOfTypingANumber {
-            history.text = history.text! + " " + display.text!
-        }
-        
         userIsTheMiddleOfTypingANumber = false
-        operandStack.append(displayValue!)
-        print("operandStack = \(operandStack)")
+        if let result = brain.pushOperand(displayValue!) {
+            displayValue = result
+        } else {
+            displayValue = nil
+        }
     }
     
     var displayValue: Double? {
@@ -152,8 +95,9 @@ class ViewController: UIViewController {
         set {
             if let value = newValue {
                 display.text = "\(value)"
+                history.text = "\(brain) ="
             } else {
-                display.text = "0"
+                display.text = " "
             }
             userIsTheMiddleOfTypingANumber = false
         }
