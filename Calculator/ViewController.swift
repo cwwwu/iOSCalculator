@@ -18,10 +18,9 @@ class ViewController: UIViewController {
     
     @IBAction func clearOperandStack() {
         userIsTheMiddleOfTypingANumber = false
-        displayValue = nil
-        history.text = " "
         brain.clearOpStack()
         brain.clearVariables()
+        displayValue = nil
     }
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -33,6 +32,7 @@ class ViewController: UIViewController {
         } else {
             display.text = digit
             userIsTheMiddleOfTypingANumber = true
+            history.text = " \(brain)"
         }
     }
     
@@ -60,11 +60,10 @@ class ViewController: UIViewController {
             } else {
                 displayValue = nil
             }
-            history.text = "\(brain)"
         }
     }
     
-    @IBAction func negate() {
+    @IBAction func negate(sender: UIButton) {
         if userIsTheMiddleOfTypingANumber {
             if display.text!.hasPrefix("−") {
                 display.text = display.text!.substringFromIndex(display.text!.startIndex.advancedBy(1))
@@ -72,7 +71,14 @@ class ViewController: UIViewController {
                 display.text = "−" + display.text!
             }
         } else {
-            //TODO:
+            if let operation = sender.currentTitle {
+                brain.performOperation(operation)
+                if let result = brain.evaluate() {
+                    displayValue = result
+                } else {
+                    displayValue = nil
+                }
+            }
         }
     }
     
@@ -83,7 +89,6 @@ class ViewController: UIViewController {
         } else {
             displayValue = nil
         }
-        history.text = "\(brain)"
     }
     
     @IBAction func setVariable() {
@@ -105,7 +110,6 @@ class ViewController: UIViewController {
         } else {
             displayValue = nil
         }
-        history.text = "\(brain)"
     }
     
     var displayValue: Double? {
@@ -120,8 +124,10 @@ class ViewController: UIViewController {
         set {
             if let value = newValue {
                 display.text = "\(value)"
+                history.text = "\(brain) ="
             } else {
-                display.text = " "
+                display.text = "0"
+                history.text = " \(brain)"
             }
             userIsTheMiddleOfTypingANumber = false
         }

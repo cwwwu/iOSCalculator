@@ -33,9 +33,37 @@ class CalculatorBrain: CustomStringConvertible {
                 }
             }
         }
+        
+        var precedence: Int {
+            get {
+                switch self {
+                case .Operand(_):
+                    return 0
+                case .UnaryOperation(_, _):
+                    return 3
+                case .BinaryOperation(let symbol, _):
+                    switch symbol {
+                    case "×":
+                        return 2
+                    case "÷":
+                        return 2
+                    case "+":
+                        return 1
+                    case "−":
+                        return 1
+                    default:
+                        return 0
+                    }
+                case .Variable(_):
+                    return 0
+                case .Constant(_, _):
+                    return 0
+                }
+            }
+        }
     }
     
-    private func prettyPrint(ops: [Op]) -> (expression: String?, remainingOps: [Op]) {
+    private func prettyPrint(ops: [Op], precedence: Int) -> (expression: String?,remainingOps: [Op]) {
         let unknownOp = "?"
         if !ops.isEmpty {
             var remainingOps = ops
@@ -45,15 +73,15 @@ class CalculatorBrain: CustomStringConvertible {
             case .Operand(let operand):
                 return ("\(operand)", remainingOps)
             case .UnaryOperation(let operation, _):
-                let unaryExpr = prettyPrint(remainingOps)
+                let unaryExpr = prettyPrint(remainingOps, precedence: 0)
                 var expr = unknownOp
                 if let expression = unaryExpr.expression {
                     expr = expression
                 }
                 return ("\(operation)(\(expr))", unaryExpr.remainingOps)
             case .BinaryOperation(let operation, _):
-                let op2Result = prettyPrint(remainingOps)
-                let op1Result = prettyPrint(op2Result.remainingOps)
+                let op2Result = prettyPrint(remainingOps, precedence: op.precedence)
+                let op1Result = prettyPrint(op2Result.remainingOps, precedence: op.precedence)
                 var op2Expr = unknownOp
                 var op1Expr = unknownOp
                 if let op2 = op2Result.expression {
@@ -62,7 +90,11 @@ class CalculatorBrain: CustomStringConvertible {
                 if let op1 = op1Result.expression {
                     op1Expr = op1
                 }
-                return ("(\(op1Expr) \(operation) \(op2Expr))", op1Result.remainingOps)
+                if precedence > op.precedence {
+                    return ("(\(op1Expr) \(operation) \(op2Expr))", op1Result.remainingOps)
+                } else {
+                    return ("\(op1Expr) \(operation) \(op2Expr)", op1Result.remainingOps)
+                }
             case .Variable(let variable):
                 return (variable, remainingOps)
             case .Constant(let constant, _):
@@ -78,7 +110,7 @@ class CalculatorBrain: CustomStringConvertible {
             var result: String?
             var remainder = opStack
             while true {
-                (result, remainder) = prettyPrint(remainder)
+                (result, remainder) = prettyPrint(remainder, precedence: 0)
                 if let expression = result {
                     prettyPrintString = expression + prettyPrintString
                 }
@@ -110,6 +142,7 @@ class CalculatorBrain: CustomStringConvertible {
         learnOp(Op.UnaryOperation("√", sqrt))
         learnOp(Op.UnaryOperation("sin", sin))
         learnOp(Op.UnaryOperation("cos", cos))
+        learnOp(Op.UnaryOperation("+/−", {-1 * $0}))
         learnOp(Op.Constant("π", M_PI))
     }
     
